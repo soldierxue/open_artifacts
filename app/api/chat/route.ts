@@ -75,10 +75,9 @@ export async function POST(req: Request) {
   let streamData: StreamData = new StreamData()
 
   const result = await streamText({
-    // model: bedrock('anthropic.claude-3-sonnet-20240229-v1:0',
-     model: bedrock('anthropic.claude-3-5-sonnet-20240620-v1:0',
+     model: bedrock(process.env.MODEL_ID || 'anthropic.claude-3-5-sonnet-20240620-v1:0',
        {
-      additionalModelRequestFields: { top_k: 250 },
+      additionalModelRequestFields: { top_k: 250,temperature:0.1, top_p:0.9 },
     }),
     tools: {
       runPython: tool({

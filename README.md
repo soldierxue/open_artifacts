@@ -32,13 +32,14 @@ docker build -t python3.10 .
 ```
 这个命令会创建一个名为 python3.10 的 Docker 镜像。如果需要安装某个特定的 Python 版本，或者需要安装其他依赖，则可以在Dockerfile 中进行修改。
 
-### 2. 配置.env
+### 2. 配置.env, 设置AK SK，并开通权限
 1. 在open_artifacts目录下创建一个：.env文件，内容如下
 ```
 AWS_ACCESS_KEY_ID=*******
 AWS_SECRET_ACCESS_KEY=******
 AWS_REGION=us-east-1
 PYTHON_DOCKER_IMAGE=python3.10
+MODULE_ID=anthropic.claude-3-5-sonnet-20240620-v1:0
 ```
 
 2. 如果在本地启用执行，执行成功会打开本地3000的ui端口. 通过http://localhost:3000访问
