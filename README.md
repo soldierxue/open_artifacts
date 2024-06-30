@@ -74,6 +74,9 @@ the planets should be orbiting around the sun. Add a light source to the sun and
 把图片中latency与concurrency的关系绘制出来，可视化展示
 ```
 ![alt text](asset/image3.png)
-
+```
+你是一名专业的数据分析师，第1张图是ml.p4d.24xlarge，在tp=8的性能测试数据，第2张图是ml.p4de.24xlarge，在tp=4的性能测试数据，第3张图是ml.p4de.24xlarge，在tp=8的性能测试数据。请对比分析这3张图中的数据，并绘制可视化的数据分析对比图，重点关注concurrency 跟 throughput，latency的关系
+```
+![alt text](asset/image4.png)
 ## 其他
 ### 其他功能正在设计中
