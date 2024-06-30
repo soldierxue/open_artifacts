@@ -6,7 +6,7 @@ Artifacts是Anthropic推出的一项新功能，它扩展了用户与Claude模�
 可以实时查看、编辑和构建Claude的创作，将claude生成的内容无缝集成到他们的项目和工作流程中
 
 ## 本开源Artifacts项目简介
-- 本项目采用 [Vercel AI](https://sdk.vercel.ai/) 是一个next.js开源的大模型应用开发框架，并借鉴了[e2b](https://e2b.dev/docs) 中的example，它通过code intereptor组件与Claude模型交互，生成相应的代码，文本及设计内容，然后通过e2b的云端sandbox执行并返回交互式的结果。
+- 本项目采用 [Vercel AI](https://sdk.vercel.ai/) 一个next.js开源的大模型应用开发框架，使用Amazon Bedrock上的Claude 3.5，并借鉴了[e2b](https://e2b.dev/docs) 中的example，复刻一个开源版本的Anthropic的Artifacts UI功能，它通过code intereptor组件与Claude模型交互，生成相应的代码，文本及设计内容，然后通过本地build的sandbox镜像执行并返回交互式的结果。
 - 目前主要功能特点如下：
 1. 支持Bedrock Claude 3.5接入
 2. 直接使用本地自己制作的docker image作为sandbox，保证数据隐私和安全，提高开发便捷性，执行性能。
