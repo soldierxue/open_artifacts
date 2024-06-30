@@ -70,15 +70,16 @@ the planets should be orbiting around the sun. Add a light source to the sun and
 ![alt text](asset/image2.png)
 
 3. 数据可视化分析
+- 提示词
 ```
-把图片中latency与concurrency的关系绘制出来，可视化展示
+你是一名专业的数据分析师，第1张图是ml.alpha.24xlarge，在tp=8的性能测试数据，第2张图是ml.beta.24xlarge，在tp=4的性能测试数据，第3张图是ml.beta.24xlarge，在tp=8的性能测试数据。请对比分析这3张图中的数据，并绘制可视化的数据分析对比图，重点关注concurrency 跟 throughput，latency的关系
 ```
-![alt text](asset/image3.png)
-```
-你是一名专业的数据分析师，第1张图是ml.p4d.24xlarge，在tp=8的性能测试数据，第2张图是ml.p4de.24xlarge，在tp=4的性能测试数据，第3张图是ml.p4de.24xlarge，在tp=8的性能测试数据。请对比分析这3张图中的数据，并绘制可视化的数据分析对比图，重点关注concurrency 跟 throughput，latency的关系
-```
-![alt text](asset/image4.png)
-
+- 上传图片1，2，3
+![alt text](asset/image3_1.png)
+![alt text](asset/image3_2.png)
+![alt text](asset/image3_3.png)
+- 结果
+![alt text](asset/image3_4.png)
 4. 生成架构图
 ```
 create an web server architecture diagram using aws loadbalancer, ec2, rds
@@ -90,9 +91,15 @@ add api gateway between lb and web servers, and put the servers in vpc
 it errors : No module named 'diagrams.aws.apigateway'\n
 ```
 ![alt text](asset/image5.png)
+
+5. 不同云只之间的架构转换
+- 提示词
 ```
 explain the architecture in the image, and alternate all the services to aws services accordingly and draw aws architecture diagram
 ```
+- 上传图片
+![alt text](asset/image6_0.png)
+- 结果
 ![alt text](asset/image6.png)
 ## 其他
 ### 其他功能正在设计中
