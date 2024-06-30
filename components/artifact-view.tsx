@@ -68,7 +68,6 @@ export function ArtifactView({
   // TODO: Check other formats than `png`
   if (cellResults.length > 0) {
     if (cellResults[0].png){
-      const imgInBase64 = cellResults[0].png
       return (
         <>
           <div className="w-full flex-1 p-4 flex flex-col items-center justify-start space-y-4">
@@ -77,17 +76,11 @@ export function ArtifactView({
               key={index}
               src={`data:image/png;base64,${result.png}`}
               alt="result"
-              width={600}
+              width={800}
               height={400}
             />
 
             ))}
-            <Image
-              src={`data:image/png;base64,${imgInBase64}`}
-              alt="result"
-              width={600}
-              height={400}
-            />
           </div>
           <LogsOutput stdout={stdout} stderr={stderr} />
         </>

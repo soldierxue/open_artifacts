@@ -78,5 +78,21 @@ the planets should be orbiting around the sun. Add a light source to the sun and
 你是一名专业的数据分析师，第1张图是ml.p4d.24xlarge，在tp=8的性能测试数据，第2张图是ml.p4de.24xlarge，在tp=4的性能测试数据，第3张图是ml.p4de.24xlarge，在tp=8的性能测试数据。请对比分析这3张图中的数据，并绘制可视化的数据分析对比图，重点关注concurrency 跟 throughput，latency的关系
 ```
 ![alt text](asset/image4.png)
+
+4. 生成架构图
+```
+create an web server architecture diagram using aws loadbalancer, ec2, rds
+```
+```
+add api gateway between lb and web servers, and put the servers in vpc
+```
+```
+it errors : No module named 'diagrams.aws.apigateway'\n
+```
+![alt text](asset/image5.png)
+```
+explain the architecture in the image, and alternate all the services to aws services accordingly and draw aws architecture diagram
+```
+![alt text](asset/image6.png)
 ## 其他
 ### 其他功能正在设计中

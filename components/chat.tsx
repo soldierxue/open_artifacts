@@ -44,7 +44,7 @@ export function Chat({
       event?.preventDefault?.();
       if (!input && images.length === 0) return;
 
-      const content = tools_text ? `Here is the code:\n${tools_text}, \n\n Here is the new user request:${input}` : input;
+      const content = tools_text ? `Here is the code:\n${tools_text}, \n\n Here is the new user request:\n${input}` : input;
 
 
       append({

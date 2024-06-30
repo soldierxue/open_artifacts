@@ -12,10 +12,11 @@ RUN apt-get update && apt-get install -y \
     libsm6 \
     libxrender1 \
     git \
+    graphviz \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python packages using pip
-RUN pip install --no-cache-dir numpy pandas scipy scikit-learn matplotlib seaborn jupyter_client
+RUN pip install --no-cache-dir numpy pandas scipy scikit-learn matplotlib seaborn jupyter_client diagrams requests bs4 requests
 
 # Set default command
 CMD ["python"]

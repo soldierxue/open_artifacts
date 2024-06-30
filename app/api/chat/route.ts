@@ -53,7 +53,7 @@ type initMessages ={
 export async function POST(req: Request) {
   const { messages, userID, data }: { messages: CoreMessage[], userID: string, data:string } = await req.json()
   // console.log('userID', userID)
-  console.log(messages)
+  // console.log(messages)
   // console.log(data)
   const initialMessages = messages.slice(0, -1) as initMessages [];
   // const coreMessages = convertToCoreMessages(initialMessages) 
@@ -77,7 +77,7 @@ export async function POST(req: Request) {
   const result = await streamText({
      model: bedrock(process.env.MODEL_ID || 'anthropic.claude-3-5-sonnet-20240620-v1:0',
        {
-      additionalModelRequestFields: { top_k: 250,temperature:0.1, top_p:0.9 },
+      additionalModelRequestFields: { top_k: 250},
     }),
     tools: {
       runPython: tool({
@@ -102,7 +102,6 @@ export async function POST(req: Request) {
             tool: 'runPython',
             state: 'complete',
           })
-
           return {
             stdout,
             stderr,
@@ -130,10 +129,6 @@ export async function POST(req: Request) {
           const stderr = execOutput.logs.stderr
           const runtimeError = execOutput.error
           const results = execOutput.results
-          // const stdout :string [] = []
-          // const stderr :string [] = []
-          // const runtimeError = undefined
-          // const results = [{'html':code}]
 
           streamData.append({
             tool: 'runJs',
@@ -152,15 +147,20 @@ export async function POST(req: Request) {
     toolChoice: 'auto',
     system: `
     You are a skilled Python and Javascript developer.
-    One of your expertise is also data science.
-    You can run Python, Javascript and bash code. Code for each programming language runs in its own context and reference previous definitions and variables.
-    The code runs inside a Jupyter notebook so we can easily get visualizations.
-    Use seaborn for data visualization.
-
+    You are also expert of data science and data analysis, and you are also expert of solution architecture of AWS, Google Cloud, Azure, etc.
+    Your also very farmiliar with the tools and libraries such as:
+    <python_libraries>
+    pandas, numpy, matplotlib, seaborn, scikit-learn, diagrams, etc.
+    </python_libraries>
+    <js_libraries>
+    d3, react, canvas, threejs, cannonjs, etc.
+    </js_libraries>
+    
+    You can choose tools to run Python, Javascript code to solve user's task. Code for each programming language runs in its own context and reference previous definitions and variables.
     Messages inside [] means that it's a UI element or a user event. For example:
     - "[Chart was generated]" means a chart in a Jupyter notebook was generated and displayed to user.
     `,
-    messages:newMessages,
+    messages:newMessages as CoreMessage[],
   })
 
   const stream = result.toAIStream({

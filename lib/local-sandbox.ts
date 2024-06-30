@@ -68,38 +68,46 @@ export async function runPython(userID: string,code: string): Promise<CodeExecRe
         const result = await new Promise<string>((resolve, reject) => {
             exec(dockerCommand, (error, stdout, stderr) => {
                 if (error) {
-                    reject(error);
+                    reject(error.message);
                     return;
                 }
                 if (stderr) {
                     console.error('Docker stderr:', stderr);
+                    reject(stderr);
+                    return;
                 }
                 resolve(stdout);
             });
         });
 
-        // 检查生成的图片文件，转换为 base64，然后删除
-        for (let i = 1; ; i++) {
-            const imagePath = path.join(__dirname, `${tempPrefix}_figure_${i}.png`);
-            const imageExists = await fs.access(imagePath).then(() => true).catch(() => false);
-            if (imageExists) {
+        try {
+            const files = await fs.readdir(__dirname);
+            // 过滤出所有 .png 文件
+            const pngFiles = files.filter(file => path.extname(file).toLowerCase() === '.png');
+            for (const file of pngFiles) {
+                const imagePath = path.join(__dirname, file);
                 const imageBuffer = await fs.readFile(imagePath);
                 const base64Image = imageBuffer.toString('base64');
-                generatedFiles.push(`${base64Image}`);
+                generatedFiles.push(base64Image);
                 // 删除临时图片文件
                 await fs.unlink(imagePath);
-            } else {
-                break;
             }
+            console.log(`Total processed images: ${generatedFiles.length}`);
+        } catch (error) {
+            console.error('Error processing images:', error);
+            throw error;
         }
+
+
         stdOutStr = result.trim();
         console.log('Python execution result:', stdOutStr);
         generatedFiles.forEach(file => {
             console.log(`${file.substring(0, 50)}...`);
           });
     } catch (error) {
-        console.error('Error:', error);
+        console.error('dockerCommand Error:', error);
         stdErrStr = JSON.stringify(error);
+        console.log('stdErrStr:',stdErrStr);
         throw error;
     } finally {
         // 清理临时文件
