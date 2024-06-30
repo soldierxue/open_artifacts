@@ -111,4 +111,16 @@ explain the architecture in the image, and alternate all the services to aws ser
 - 结果
 ![alt text](asset/image6.png)
 ## 其他
-### 其他功能正在设计中
+### FAQ
+1. 如何保证运行代码的依赖都能满足？
+可以根据前端代码执行页面返回的报错信息，查看是否缺少module，如果缺少可以修改docker_files/Dockerfile文件，添加对应的包，然后build即可
+```bash
+docker build -t python3.10 .
+```
+
+
+### Roadmap
+1. 支持其他代码执行器
+    1. Golang
+    2. Java
+    3. C++
