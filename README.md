@@ -14,11 +14,13 @@ Artifacts是Anthropic推出的一项新功能，它扩展了用户与Claude模�
 4. 新增图片上传加入多模态能力，例如可以上传excel表格，pdf截图，并生成代码做数据可视化分析。
 5. 其他小功能，例如清除上下文，复制粘贴直接上传图片等
 
-## 使用说明
-### 1. 配置docker image
-1. 进入open_artifacts/docker_files
+## 环境准备
+- 可以在本地mac环境或者Amazon EC2实例(Amazon Linux 2023或者ubuntu系统)，CPU机型即可，无需GPU实例
+1. 安装nodejs和yarn
 ```bash
-cd open_artifacts/docker_files
+sudo yum install https://rpm.nodesource.com/pub_18.x/nodistro/repo/nodesource-release-nodistro-1.noarch.rpm -y
+sudo yum install nodejs -y --setopt=nodesource-nodejs.module_hotfixes=1 --nogpgcheck
+sudo npm install --global yarn
 ```
 2. 安装 &启动 docker(如有可调过)
 ```bash
@@ -26,7 +28,14 @@ sudo yum install docker -y
 sudo service docker start
 sudo chmod 666 /var/run/docker.sock
 ```
-3. 在本文件夹下（包含 Dockerfile） 的目录中打开终端，运行以下命令来构建 Docker 镜像：
+## 使用说明
+### 1. 配置docker image
+1. 进入open_artifacts/docker_files
+```bash
+cd open_artifacts/docker_files
+```
+
+2. 在本文件夹下（包含 Dockerfile） 的目录中打开终端，运行以下命令来构建 Docker 镜像：
 ```bash
 docker build -t python3.10 .
 ```
