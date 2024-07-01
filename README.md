@@ -118,6 +118,10 @@ explain the architecture in the image, and alternate all the services to aws ser
 docker build -t python3.10 .
 ```
 
+### 使用PM2后台运行
+```bash
+pm2 start pm2run.config.js 
+```
 
 ### Roadmap
 1. 支持其他代码执行器
