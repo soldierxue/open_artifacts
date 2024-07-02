@@ -2,6 +2,7 @@ import { z } from 'zod'
 import {
   type CoreMessage,
   type ImagePart,
+  type TextPart,
   type UserContent,
   StreamingTextResponse,
   StreamData,
@@ -15,7 +16,10 @@ import {
   runPython,
   runJs
 } from '@/lib/local-sandbox'
-
+import {type FileData} from '@/components/chat';
+import { writeFile } from 'fs/promises';
+import { tmpdir } from 'os';
+import { join } from 'path';
 // import { ToolResult } from 'ai/generate-text/tool-result';
 
 
@@ -49,6 +53,17 @@ type initMessages ={
   toolInvocations?: Array<ToolResult<string, unknown, unknown>>;
 };
 
+const  saveFile = async (file:File,result:string) => {
+  // 备份CSV文件到临时目录
+  try {
+    const tempDir = tmpdir();
+    const tempFilePath = join(tempDir, `backup_${file.name}`);
+    await writeFile(tempFilePath, result);
+    console.log(`CSV file backed up to: ${tempFilePath}`);
+  } catch (error) {
+    console.error('Error backing up CSV file:', error);
+  }
+};
 
 export async function POST(req: Request) {
   const { messages, userID, data }: { messages: CoreMessage[], userID: string, data:string } = await req.json()
@@ -58,8 +73,23 @@ export async function POST(req: Request) {
   const initialMessages = messages.slice(0, -1) as initMessages [];
   // const coreMessages = convertToCoreMessages(initialMessages) 
   const currentMessage = messages[messages.length - 1];
-  const imageData = data?JSON.parse(data):[];
-  const imageMessages = (imageData as []).map(it => ({ type: 'image', image: it})) as ImagePart[];
+  const fileData =  data?JSON.parse(data):null;
+  let imageData : string []= [];
+  let textData : string []= [];
+  if (fileData&& fileData.length> 0) {
+    fileData.map((it:FileData) => {
+      if (it.type === 'image') {
+        imageData.push(it.content);
+      }else if (it.type === 'text' || it.type === 'csv') {
+        textData.push(it.content);
+      }else {
+        console.log(`${it.type} not supported yet`)
+      }
+    })
+  }
+  const imageMessages = imageData.length>0? 
+                    (imageData as []).map(it => ({ type: 'image', image: it})) as ImagePart[]:
+                    (textData.length>0 ? textData.map(it => ({ type: 'text', text: `Attached:\n${it}`})) as TextPart[]:[])
   const userContent = [
     { type: 'text', text: currentMessage.content as string },
     ...imageMessages
@@ -71,7 +101,7 @@ export async function POST(req: Request) {
       content: userContent as UserContent,
     },
   ];
-  console.log(newMessages)
+  // console.log(newMessages)
   let streamData: StreamData = new StreamData()
 
   const result = await streamText({
@@ -85,7 +115,7 @@ export async function POST(req: Request) {
         parameters: z.object({
           title: z.string().describe('Short title (5 words max) of the artifact.'),
           description: z.string().describe('Short description (10 words max) of the artifact.'),
-          code: z.string().describe('The code to run.'),
+          code: z.string().describe('The code to run in its own context'),
         }),
         async execute({ code }) {
           streamData.append({
@@ -148,17 +178,19 @@ export async function POST(req: Request) {
     system: `
     You are a skilled Python and Javascript developer.
     You are also expert of data science and data analysis, and you are also expert of solution architecture of AWS, Google Cloud, Azure, etc.
-    Your also very farmiliar with the tools and libraries such as:
+    You are very familiar with the following tools and libraries:
+    For Python:
     <python_libraries>
     pandas, numpy, matplotlib, seaborn, scikit-learn, diagrams, etc.
     </python_libraries>
+
+    For JavaScript:
     <js_libraries>
     d3, react, canvas, threejs, cannonjs, etc.
     </js_libraries>
-    
-    You can choose tools to run Python, Javascript code to solve user's task. Code for each programming language runs in its own context and reference previous definitions and variables.
-    Messages inside [] means that it's a UI element or a user event. For example:
-    - "[Chart was generated]" means a chart in a Jupyter notebook was generated and displayed to user.
+
+    You have the ability to choose the appropriate tools and run Python or JavaScript code to solve the user's task. Code for each programming language runs in its own context and can reference previous definitions and variables.
+    Your code will be run in a seperate sandbox, so you don't write the code that contains code to read the data or file locally.
     `,
     messages:newMessages as CoreMessage[],
   })
