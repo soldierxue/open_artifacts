@@ -1,5 +1,5 @@
 # Open Artifacts
-
+[English](./README_en.md) | [中文](./README.md)
 ## 关于Artifacts
 Artifacts是Anthropic推出的一项新功能，它扩展了用户与Claude模型的互动方式。
 当用户要求Claude生成代码片段、文本文档或网站设计等内容时，这些工件会出现在他们对话的专用窗口中。
@@ -118,7 +118,7 @@ explain the architecture in the image, and alternate all the services to aws ser
 docker build -t python3.10 .
 ```
 
-### 使用PM2后台运行
+2. 使用PM2后台运行
 ```bash
 pm2 start pm2run.config.js 
 ```
@@ -126,5 +126,4 @@ pm2 start pm2run.config.js
 ### Roadmap
 1. 支持其他代码执行器
     1. Golang
-    2. Java
-    3. C++
+    2. Nodejs
