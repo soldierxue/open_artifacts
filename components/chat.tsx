@@ -1,5 +1,5 @@
 import { useState, useEffect, FormEvent, useCallback, useRef } from 'react'
-import { Terminal, Image as ImageIcon ,Trash2,FileText, FileSpreadsheet} from 'lucide-react'
+import { Terminal, Image as ImageIcon ,Paperclip,Trash2,FileText, FileSpreadsheet} from 'lucide-react'
 import { Message } from 'ai/react'
 import type {
   ChatRequestOptions,
@@ -235,7 +235,7 @@ export function Chat({
             onClick={() => fileInputRef.current?.click()}
             className="p-2 bg-[#FFE7CC] rounded-lg"
           >
-            <ImageIcon className="text-[#FF8800]" />
+            <Paperclip className="text-[#FF8800]" />
           </button>
           <input
             type="file"
