@@ -48,7 +48,7 @@ AWS_ACCESS_KEY_ID=*******
 AWS_SECRET_ACCESS_KEY=******
 AWS_REGION=us-east-1
 PYTHON_DOCKER_IMAGE=python3.10
-MODULE_ID=anthropic.claude-3-5-sonnet-20240620-v1:0
+MODEL_ID=anthropic.claude-3-5-sonnet-20240620-v1:0
 ```
 
 2. 如果在本地启用执行，执行成功会打开本地3000的ui端口. 通过http://localhost:3000访问
