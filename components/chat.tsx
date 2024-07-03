@@ -1,5 +1,5 @@
 import { useState, useEffect, FormEvent, useCallback, useRef } from 'react'
-import { Terminal, Image as ImageIcon ,Trash2} from 'lucide-react'
+import { Terminal, Image as ImageIcon ,Paperclip,Trash2,FileText, FileSpreadsheet} from 'lucide-react'
 import { Message } from 'ai/react'
 import type {
   ChatRequestOptions,
@@ -8,9 +8,11 @@ import type {
 import { Input } from '@/components/ui/input'
 
 
-interface ImageData {
+export interface FileData {
   id: string;
-  base64: string;
+  type: 'image' | 'text' | 'csv';
+  content: string;
+  name: string;
 }
 
 export function Chat({
@@ -30,7 +32,7 @@ export function Chat({
   setInput: (e: any) => void,
   clearMessages: () => void
 }) {
-  const [images, setImages] = useState<ImageData[]>([]);
+  const [files, setFiles] = useState<FileData[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   // console.log('messages', messages);
   const latestMessageWithToolInvocation = [...messages].reverse().find(message => message.toolInvocations && message.toolInvocations.length > 0)
@@ -42,7 +44,7 @@ export function Chat({
       options: ChatRequestOptions = {},
     ) => {
       event?.preventDefault?.();
-      if (!input && images.length === 0) return;
+      if (!input && files.length === 0) return;
 
       const content = tools_text ? `Here is the code:\n${tools_text}, \n\n Here is the new user request:\n${input}` : input;
 
@@ -57,59 +59,118 @@ export function Chat({
       );
 
       setInput('');
-      setImages([]);
+      setFiles([]);
     },
     [input, append],
   );
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files) {
-      Array.from(files).forEach(file => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          setImages(prev => [...prev, { id: Date.now().toString(), base64: e.target?.result as string }]);
-        };
+  const csvToMarkdown = (csv: string): string => {
+    const rows = csv.trim().split('\n').map(row => row.split(','));
+    const headers = rows[0];
+    const body = rows.slice(1);
+
+    let markdown = '| ' + headers.join(' | ') + ' |\n';
+    markdown += '| ' + headers.map(() => '---').join(' | ') + ' |\n';
+    body.forEach(row => {
+      markdown += '| ' + row.join(' | ') + ' |\n';
+    });
+
+    return markdown;
+  };
+
+
+
+  const processFile = (file: File): Promise<FileData> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const result = e.target?.result as string;
+        let type: 'image' | 'text' | 'csv';
+        let content = result;
+        if (file.type.startsWith('image/')) {
+          type = 'image';
+        } else if (file.name.endsWith('.csv')) {
+          type = 'csv';
+          content = csvToMarkdown(result)
+          
+        } else {
+          type = 'text';
+        }
+        resolve({
+          id: Date.now().toString(),
+          type,
+          content: content,
+          name: file.name
+        });
+      };
+      reader.onerror = reject;
+
+      if (file.type.startsWith('image/')) {
         reader.readAsDataURL(file);
-      });
+      } else {
+        reader.readAsText(file);
+      }
+    });
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = event.target.files;
+    if (selectedFiles) {
+      const processedFiles = await Promise.all(Array.from(selectedFiles).map(processFile));
+      setFiles(prev => [...prev, ...processedFiles]);
     }
   };
 
-  const handlePaste = (event: React.ClipboardEvent) => {
+  const handlePaste = async (event: React.ClipboardEvent) => {
     const items = event.clipboardData?.items;
     if (items) {
       for (let i = 0; i < items.length; i++) {
-        if (items[i].type.indexOf('image') !== -1) {
-          const blob = items[i].getAsFile();
-          if (blob) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-              setImages(prev => [...prev, { id: Date.now().toString(), base64: e.target?.result as string }]);
-            };
-            reader.readAsDataURL(blob);
+        const item = items[i];
+        if (item.kind === 'file') {
+          const file = item.getAsFile();
+          if (file) {
+            const processedFile = await processFile(file);
+            setFiles(prev => [...prev, processedFile]);
           }
         }
       }
     }
   };
 
-  const removeImage = (id: string) => {
-    setImages(prev => prev.filter(img => img.id !== id));
+  const removeFile = (id: string) => {
+    setFiles(prev => prev.filter(file => file.id !== id));
   };
 
+  const renderFilePreview = (file: FileData) => {
+    switch (file.type) {
+      case 'image':
+        return <img src={file.content} alt={file.name} className="w-full h-full object-cover rounded" />;
+      case 'text':
+        return <FileText className="w-full h-full text-gray-600" />;
+      case 'csv':
+        return <FileSpreadsheet className="w-full h-full text-green-600" />;
+    }
+  };
   return (
     <div className="flex-1 flex flex-col py-4 gap-4 max-h-full max-w-[800px] mx-auto justify-between">
       <div className="flex flex-col gap-2 overflow-y-auto max-h-full px-4 rounded-lg">
         {messages.map(message => (
           <div className={`py-2 px-4 shadow-sm whitespace-pre-wrap ${message.role !== 'user' ? 'bg-white' : 'bg-white/40'} rounded-lg border-b border-[#FFE7CC] font-serif`} key={message.id}>
             {message.content}
-            {message.data && ( JSON.parse(message.data as string).map( (base64:string, index:number) => (
+            {message.data && ( JSON.parse(message.data as string).map( (fileData:FileData, index:number) => (
               <div key={index} className="mt-4 flex justify-start items-start border border-[#FFE7CC] rounded-md">
-                <img 
-                  src={base64} 
-                  alt="Uploaded" 
-                  className="mt-2 max-w-full h-auto rounded"
-                />
+               {fileData.type === 'image' ? (
+                  <img
+                    src={fileData.content}
+                    alt="Uploaded"
+                    className="mt-2 max-w-full h-auto rounded"
+                  />
+                ) : (
+                  <div className="p-2">
+                    <p>{fileData.name}</p>
+                    <p>{fileData.type === 'csv' ? 'CSV file' : 'Text file'}</p>
+                  </div>
+                )}
               </div>
               ))
             )}  
@@ -134,18 +195,18 @@ export function Chat({
 
       <form onSubmit={e => {
         customSubmit(e, {
-          data: images.length ? JSON.stringify(images.map(img => img.base64)) : undefined
+          data: files.length ? JSON.stringify(files) : undefined
         })
       }}
         className="flex flex-col gap-2">
-        {images.length > 0 && (
+        {files.length > 0 && (
           <div className="flex flex-wrap gap-2">
-            {images.map((img) => (
-              <div key={img.id} className="relative w-24 h-24">
-                <img src={img.base64} alt="Uploaded" className="w-full h-full object-cover rounded" />
+            {files.map((file) => (
+              <div key={file.id} className="relative w-24 h-24">
+                 {renderFilePreview(file)}
                 <button
                   type="button"
-                  onClick={() => removeImage(img.id)}
+                  onClick={() => removeFile(file.id)}
                   className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1"
                 >
                   X
@@ -174,13 +235,13 @@ export function Chat({
             onClick={() => fileInputRef.current?.click()}
             className="p-2 bg-[#FFE7CC] rounded-lg"
           >
-            <ImageIcon className="text-[#FF8800]" />
+            <Paperclip className="text-[#FF8800]" />
           </button>
           <input
             type="file"
             ref={fileInputRef}
             onChange={handleFileChange}
-            accept="image/*"
+            accept="image/*,text/*,.csv"
             multiple
             className="hidden"
           />

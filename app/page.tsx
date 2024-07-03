@@ -1,5 +1,8 @@
 'use client'
 
+import { useEffect } from 'react'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { useChat } from 'ai/react'
 
@@ -10,12 +13,19 @@ import { SideView } from '@/components/side-view'
 const userID = 'dummy-user-id'
 
 export default function Home() {
-  const { messages, setMessages,input,setInput,append, handleInputChange, handleSubmit, data ,} = useChat({
-    // maxToolRoundtrips: 5,
+  const { data: session, status } = useSession()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/login')
+    }
+  }, [status, router])
+
+  const { messages, setMessages, input, setInput, append, handleInputChange, handleSubmit, data } = useChat({
     api: '/api/chat',
     body: { userID },
   })
-  // console.log({ messages, data })
 
   // For simplicity, we care only about the latest message that has a tool invocation
   const latestMessageWithToolInvocation = [...messages].reverse().find(message => message.toolInvocations && message.toolInvocations.length > 0)
@@ -25,6 +35,14 @@ export default function Home() {
   const clearMessages = () => {
     setMessages([]);
   };
+
+  if (status === 'loading') {
+    return <div>Loading...</div>
+  }
+
+  if (!session) {
+    return null
+  }
 
   return (
     <main className="flex min-h-screen max-h-screen">
