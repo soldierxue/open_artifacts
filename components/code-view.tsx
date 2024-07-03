@@ -1,7 +1,28 @@
-export function CodeView({ code }: { code: string }) {
+import React from 'react';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+
+interface CodeViewProps {
+  code: string;
+  language?: string;
+}
+
+export function CodeView({ code, language = 'javascript' }: CodeViewProps) {
   return (
-    <pre className="max-h-full p-4 text-sm rounded-md">
-      <code className="whitespace-pre-wrap">{code}</code>
-    </pre>
-  )
+    <div className="max-h-full rounded-md">
+      <SyntaxHighlighter
+        language={language}
+        style={vscDarkPlus}
+        customStyle={{
+          padding: '1rem',
+          fontSize: '0.875rem',
+          borderRadius: '0.375rem',
+        }}
+        wrapLines={true}
+        wrapLongLines={true}
+      >
+        {code}
+      </SyntaxHighlighter>
+    </div>
+  );
 }

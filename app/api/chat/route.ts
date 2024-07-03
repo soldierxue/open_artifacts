@@ -122,7 +122,6 @@ export async function POST(req: Request) {
             tool: 'runPython',
             state: 'running',
           })
-
           const execOutput = await runPython(userID, code)
           const stdout = execOutput.logs.stdout
           const stderr = execOutput.logs.stderr
@@ -153,7 +152,6 @@ export async function POST(req: Request) {
             tool: 'runJs',
             state: 'running',
           })
-
           const execOutput = await runJs(userID, code)
           const stdout = execOutput.logs.stdout
           const stderr = execOutput.logs.stderr

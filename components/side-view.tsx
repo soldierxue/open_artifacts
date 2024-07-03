@@ -22,7 +22,11 @@ export function SideView({
   if (!toolInvocation || !data) {
     return null
   }
-  // console.log('data:',data)
+  console.log('data:',data)
+  const defualtLang = 'javascript'
+  const language = data[0]?.tool === 'runJs' ?  'javascript' : 
+                    (data[0]?.tool === 'runPython' ? 'python':defualtLang)
+
   const { args, result }: { args: Record<string, any>, result?: CodeExecResult } = toolInvocation
   // console.log('SideView:',result)
   let latestData: any = {
@@ -49,7 +53,7 @@ export function SideView({
         {toolInvocation && (
           <div className="w-full flex-1 flex flex-col items-start justify-start overflow-y-auto">
             <TabsContent value="code" className="flex-1 w-full">
-              <CodeView code={args.code}/>
+              <CodeView code={args.code} language={language}/>
             </TabsContent>
             <TabsContent value="artifact" className="flex-1 w-full flex flex flex-col items-start justify-start">
               <ArtifactView result={result} />
