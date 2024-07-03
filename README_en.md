@@ -49,6 +49,8 @@ AWS_SECRET_ACCESS_KEY=******
 AWS_REGION=us-east-1
 PYTHON_DOCKER_IMAGE=python3.10
 MODEL_ID=anthropic.claude-3-5-sonnet-20240620-v1:0
+USERNAME=
+PASSWORD=
 ```
 
 2. If running locally, execute the following. Upon successful execution, it will open the local UI port 3000. Access via http://localhost:3000
